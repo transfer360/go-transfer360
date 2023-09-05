@@ -30,6 +30,7 @@ type Request struct {
 	DateTime string `json:"contravention_date" validate:"required"`
 	// a reference number which goes with the vehicle registration - required field
 	Reference string `json:"your_reference" validate:"required"`
+	InitalSref        string `json:"inital_sref,omitempty"` // if a search reference is generated and passed through
 }
 
 func (sr *Request) Validate() error {
@@ -73,6 +74,10 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 
 	if len(os.Getenv("DEVELOPMENT")) == 0 {
 		log.SetFormatter(joonix.NewFormatter())
+	}
+
+	if len(apiKey)==0 {
+		return scanReturn,fmt.Errorf("missing API Key")
 	}
 
 	log.SetLevel(log.DebugLevel)
