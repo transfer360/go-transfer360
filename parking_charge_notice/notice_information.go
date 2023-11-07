@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"strings"
 )
 
 type Information struct {
@@ -24,7 +25,17 @@ func (notice *Information) Validate() error {
 	dateNow := time.Now()
 
 	if !govalidator.IsRFC3339(notice.ContraventionDateTime) {
-		return fmt.Errorf("invalid ContraventionDatetime format, should be RFC3339 - please see documentation")
+
+		notice.ContraventionDateTime = strings.ReplaceAll(notice.ContraventionDateTime,"T"," ")
+		notice.ContraventionDateTime = strings.ReplaceAll(notice.ContraventionDateTime,"Z","")
+
+		if tm, err := time.Parse("2006-01-02 15:04:05",notice.ContraventionDateTime);err==nil{
+			notice.ContraventionDateTime = tm.Format(time.RFC3339)
+		}else{
+			return fmt.Errorf("invalid ContraventionDatetime format, should be RFC3339 - please see documentation")
+		}
+
+
 	}
 
 	cDateTime, _ := time.Parse(time.RFC3339, notice.ContraventionDateTime)
