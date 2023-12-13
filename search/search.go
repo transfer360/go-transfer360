@@ -92,7 +92,7 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 
 	jsonStr, err := json.Marshal(n)
 	if err != nil {
-		log.Error(err)
+		log.Error("SendEnquiry:1:",err)
 		return scanReturn, err
 	}
 
@@ -108,7 +108,7 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error(err)
+		log.Error("SendEnquiry:2:",err)
 		return scanReturn, err
 	}
 	defer resp.Body.Close()
@@ -119,7 +119,7 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 
 		err = json.NewDecoder(resp.Body).Decode(&sr)
 		if err != nil {
-			log.Error(err)
+			log.Error("SendEnquiry:3:",err)
 			return scanReturn, fmt.Errorf("%w %s", ErrInvalidSearchResultBody, err.Error())
 		}
 
@@ -133,7 +133,7 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			log.Error(err)
+			log.Error("SendEnquiry:4:",err)
 			return scanReturn, fmt.Errorf("%w %s", ErrInvalidSearchResultBody, err.Error())
 		}
 
