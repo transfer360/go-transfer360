@@ -1,0 +1,12 @@
+presets:
+    - bugs
+    - error
+    - sql
+    - unused
+    - style
+    - complexity
+    - performance
+    - format
+    - import
+
+# https://golangci-lint.run/usage/linters/

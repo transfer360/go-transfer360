@@ -3,6 +3,7 @@ package parking_charge_notice
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/go-playground/validator/v10"
@@ -12,13 +13,15 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"time"
 	"strings"
+	"time"
 )
 
 type Information struct {
 	pcn.Data
 }
+
+var ErrNoticeAlreadyExists = errors.New("notice already exists")
 
 func (notice *Information) Validate() error {
 
@@ -26,15 +29,14 @@ func (notice *Information) Validate() error {
 
 	if !govalidator.IsRFC3339(notice.ContraventionDateTime) {
 
-		notice.ContraventionDateTime = strings.ReplaceAll(notice.ContraventionDateTime,"T"," ")
-		notice.ContraventionDateTime = strings.ReplaceAll(notice.ContraventionDateTime,"Z","")
+		notice.ContraventionDateTime = strings.ReplaceAll(notice.ContraventionDateTime, "T", " ")
+		notice.ContraventionDateTime = strings.ReplaceAll(notice.ContraventionDateTime, "Z", "")
 
-		if tm, err := time.Parse("2006-01-02 15:04:05",notice.ContraventionDateTime);err==nil{
+		if tm, err := time.Parse("2006-01-02 15:04:05", notice.ContraventionDateTime); err == nil {
 			notice.ContraventionDateTime = tm.Format(time.RFC3339)
-		}else{
+		} else {
 			return fmt.Errorf("invalid ContraventionDatetime format, should be RFC3339 - please see documentation")
 		}
-
 
 	}
 
@@ -80,6 +82,7 @@ func (notice *Information) Send(apiKey string) error {
 	}
 
 	log.SetLevel(log.DebugLevel)
+	log.SetReportCaller(true)
 
 	err := notice.Validate()
 
@@ -88,18 +91,19 @@ func (notice *Information) Send(apiKey string) error {
 	}
 
 	sendURL := "https://api.transfer360.io/notice/parking_charge"
-	//sendURL := "http://localhost:8091/notice/parking_charge"
 	noticeData, err := json.Marshal(notice)
 	if err != nil {
 		log.Errorln(err)
 		return err
 	}
 
-
 	log.Debugln(string(noticeData))
 
-
 	req, err := http.NewRequest("POST", sendURL, bytes.NewBuffer(noticeData))
+	if err != nil {
+		log.Errorln(err)
+		return err
+	}
 	req.Header.Set("api_key", apiKey)
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
@@ -119,9 +123,14 @@ func (notice *Information) Send(apiKey string) error {
 		log.Debugf("response Body: %s", string(body))
 
 		if resp.StatusCode != http.StatusOK {
+
+			if resp.StatusCode == http.StatusConflict {
+				return ErrNoticeAlreadyExists
+			}
+
 			log.Warnf("Non-200: %d %s", resp.StatusCode, resp.Status)
 			log.Warnf("%s | %s", notice.SearchReference, string(body))
-			return fmt.Errorf("error code returned from api server (%d)[%s]", resp.StatusCode,string(body))
+			return fmt.Errorf("error code returned from api server (%d)[%s]", resp.StatusCode, string(body))
 
 		} else {
 			log.Debugln("OK")
