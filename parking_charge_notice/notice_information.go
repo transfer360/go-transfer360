@@ -22,7 +22,9 @@ type Information struct {
 }
 
 var ErrNoticeAlreadyExists = errors.New("notice already exists")
+var ErrIssuerNotSetup = errors.New("issuer is not setup")
 
+// Validate ----------------------------------------------------------------------------------------------------------
 func (notice *Information) Validate() error {
 
 	dateNow := time.Now()
@@ -75,6 +77,7 @@ func (notice *Information) Validate() error {
 
 }
 
+// Send ----------------------------------------------------------------------------------------------------------
 func (notice *Information) Send(apiKey string) error {
 
 	if len(os.Getenv("DEVELOPMENT")) == 0 {
@@ -127,6 +130,9 @@ func (notice *Information) Send(apiKey string) error {
 			if resp.StatusCode == http.StatusConflict {
 				return ErrNoticeAlreadyExists
 			}
+			if resp.StatusCode == http.StatusTooEarly {
+				return ErrIssuerNotSetup
+			}
 
 			log.Warnf("Non-200: %d %s", resp.StatusCode, resp.Status)
 			log.Warnf("%s | %s", notice.SearchReference, string(body))
@@ -140,3 +146,5 @@ func (notice *Information) Send(apiKey string) error {
 	return nil
 
 }
+
+// ----------------------------------------------------------------------------------------------------------
