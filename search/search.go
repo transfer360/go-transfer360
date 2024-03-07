@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -56,8 +57,12 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Error("SendEnquiry:2:", err)
-		return scanReturn, err
+		if strings.Contains(err.Error(), "Client.Timeout exceeded while awaiting headers") { // dont log this error out.
+			return scanReturn, err
+		} else {
+			log.Error("SendEnquiry:2:", err)
+			return scanReturn, err
+		}
 	}
 	defer resp.Body.Close()
 
