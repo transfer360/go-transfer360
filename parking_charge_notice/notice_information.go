@@ -10,6 +10,7 @@ import (
 	joonix "github.com/joonix/log"
 	log "github.com/sirupsen/logrus"
 	pcn "github.com/transfer360/sys360/notices/parking_charge_notice"
+	"golang.org/x/net/context"
 	"io"
 	"net/http"
 	"os"
@@ -117,8 +118,12 @@ func (notice *Information) Send(apiKey string) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Errorln(err)
-		return fmt.Errorf("sending go-transfer360 to api server %w", err)
+		if strings.Contains(err.Error(), "context deadline exceeded") || strings.Contains(err.Error(), "Client.Timeout exceeded while awaiting headers") {
+			return context.DeadlineExceeded
+		} else {
+			log.Errorln(err)
+			return fmt.Errorf("sending go-transfer360 to api server %w", err)
+		}
 	} else {
 		defer resp.Body.Close()
 
