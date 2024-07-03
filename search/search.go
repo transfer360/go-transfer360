@@ -76,6 +76,9 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 			return scanReturn, fmt.Errorf("%w %s", ErrInvalidSearchResultBody, err.Error())
 		}
 
+		scanReturn.VRM = n.VRM
+		scanReturn.Reference = n.Reference
+		scanReturn.ContraventionDate = n.DateTime
 		scanReturn.Sref = sr.Sref
 		scanReturn.IsHirerVehicle = sr.IsHirerVehicle
 		scanReturn.LeaseCompany = sr.LeaseCompany
