@@ -3,6 +3,7 @@ package search
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	joonix "github.com/joonix/log"
@@ -14,7 +15,7 @@ import (
 	"time"
 )
 
-func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
+func SendEnquiry(ctx context.Context, n Request, apiKey string) (scanReturn Result, err error) {
 
 	if len(os.Getenv("DEVELOPMENT")) == 0 {
 		log.SetFormatter(joonix.NewFormatter())
@@ -41,7 +42,7 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 		return scanReturn, err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		log.Error("SendEnquiry:1.1:", err)
 		return scanReturn, err
@@ -84,6 +85,14 @@ func SendEnquiry(n Request, apiKey string) (scanReturn Result, err error) {
 		scanReturn.LeaseCompany = sr.LeaseCompany
 
 		return scanReturn, nil
+
+	} else if resp.StatusCode == http.StatusGatewayTimeout {
+
+		return scanReturn, ErrTimeOutStatusCode
+
+	} else if resp.StatusCode == http.StatusServiceUnavailable {
+
+		return scanReturn, ErrUnableToHandleStatusCode
 
 	} else {
 
