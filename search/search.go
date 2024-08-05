@@ -5,14 +5,16 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	joonix "github.com/joonix/log"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	joonix "github.com/joonix/log"
+	log "github.com/sirupsen/logrus"
 )
 
 func SendEnquiry(ctx context.Context, n Request, apiKey string) (scanReturn Result, err error) {
@@ -61,8 +63,13 @@ func SendEnquiry(ctx context.Context, n Request, apiKey string) (scanReturn Resu
 		if strings.Contains(err.Error(), "Client.Timeout exceeded while awaiting headers") { // dont log this error out.
 			return scanReturn, err
 		} else {
-			log.Error("SendEnquiry:2:", err)
-			return scanReturn, err
+			if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+				log.Debugln("SendEnquiry:2: [TimeOut]", err)
+				return scanReturn, err
+			} else {
+				log.Error("SendEnquiry:2:", err)
+				return scanReturn, err
+			}
 		}
 	}
 	defer resp.Body.Close()
