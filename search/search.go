@@ -36,7 +36,8 @@ func SendEnquiry(ctx context.Context, n Request, apiKey string) (scanReturn Resu
 		return scanReturn, err
 	}
 
-	url := "https://api.transfer360.io/search"
+	//url := "https://api.transfer360.io/search"
+	url := "https://transfer360-api-v2-569859308728.europe-west1.run.app/search"
 
 	jsonStr, err := json.Marshal(n)
 	if err != nil {
