@@ -9,7 +9,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/go-playground/validator/v10 v10.21.0
 	github.com/joonix/log v0.0.0-20230221083239-7988383bab32
-	github.com/sirupsen/logrus v1.9.3
+	github.com/sirupsen/logrus v1.9.4
 	github.com/transfer360/sys360 v1.0.6
 	golang.org/x/net v0.26.0
 	google.golang.org/api v0.183.0
