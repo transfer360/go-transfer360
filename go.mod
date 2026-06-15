@@ -1,8 +1,6 @@
 module github.com/transfer360/go-transfer360
 
-go 1.21
-
-toolchain go1.22.0
+go 1.25.0
 
 require (
 	cloud.google.com/go/firestore v1.15.0
@@ -11,7 +9,7 @@ require (
 	github.com/joonix/log v0.0.0-20230221083239-7988383bab32
 	github.com/sirupsen/logrus v1.9.3
 	github.com/transfer360/sys360 v1.0.6
-	golang.org/x/net v0.26.0
+	golang.org/x/net v0.56.0
 	google.golang.org/api v0.183.0
 )
 
@@ -39,11 +37,11 @@ require (
 	go.opentelemetry.io/otel v1.27.0 // indirect
 	go.opentelemetry.io/otel/metric v1.27.0 // indirect
 	go.opentelemetry.io/otel/trace v1.27.0 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
+	golang.org/x/crypto v0.53.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/text v0.38.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto v0.0.0-20240604185151-ef581f913117 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240604185151-ef581f913117 // indirect
