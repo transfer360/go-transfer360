@@ -94,7 +94,7 @@ func (notice *Information) Send(apiKey string) error {
 		return fmt.Errorf("go-transfer360 information invalid: %w", err)
 	}
 
-	sendURL := "https://api.transfer360.io/notice/parking_charge"
+	sendURL := "https://api.transfer360.live/notice/parking_charge"
 	noticeData, err := json.Marshal(notice)
 	if err != nil {
 		log.Errorln(err)
