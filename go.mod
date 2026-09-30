@@ -3,7 +3,7 @@ module github.com/transfer360/go-transfer360
 go 1.26.0
 
 require (
-	cloud.google.com/go/firestore v1.24.0
+	cloud.google.com/go/firestore v1.26.0
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/joonix/log v0.0.0-20230221083239-7988383bab32
