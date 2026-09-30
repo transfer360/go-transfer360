@@ -9,7 +9,7 @@ require (
 	github.com/joonix/log v0.0.0-20230221083239-7988383bab32
 	github.com/sirupsen/logrus v1.10.2
 	github.com/transfer360/sys360 v1.0.6
-	golang.org/x/net v0.58.0
+	golang.org/x/net v0.59.0
 	google.golang.org/api v0.285.0
 )
 
