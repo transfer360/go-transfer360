@@ -1,3 +1,5 @@
+# Continuous integration: build and test on every push and pull request.
+
 name: Go tests
 
 on:
@@ -7,45 +9,39 @@ on:
       - main
       - master
 
+concurrency:
+  group: go-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
-
-env:
-  GOWORK: off
-  GOPRIVATE: github.com/transfer360/*,github.com/33100-io/*
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           cache: true
 
-      - name: Download modules
-        # Private transfer360 modules need PAT_TOKEN. The authenticated Git
-        # rewrite exists only for this step (trap) so build/test code can't
-        # reuse it. Without the secret, a repo with private deps fails here.
-        run: |
-          if [ -n "${PAT_TOKEN}" ]; then
-            cleanup() {
-              git config --global --unset-all url."https://x-access-token:${PAT_TOKEN}@github.com/".insteadOf || true
-            }
-            trap cleanup EXIT
-            git config --global url."https://x-access-token:${PAT_TOKEN}@github.com/".insteadOf "https://github.com/"
-          fi
-          go mod download
+      - name: Configure Git for private modules
+        run: git config --global url."https://x-access-token:${PAT_TOKEN}@github.com/".insteadOf "https://github.com/"
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Download modules
+        run: go mod download
+        env:
+          GOPRIVATE: github.com/transfer360/*
 
       - name: Build
         run: go build ./...
 
-      - name: Test
+      - name: Run tests
         run: go test -count=1 -race ./...
