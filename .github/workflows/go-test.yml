@@ -1,0 +1,47 @@
+# Continuous integration: build and test on every push and pull request.
+
+name: Go tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+concurrency:
+  group: go-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Configure Git for private modules
+        run: git config --global url."https://x-access-token:${PAT_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Download modules
+        run: go mod download
+        env:
+          GOPRIVATE: github.com/transfer360/*
+
+      - name: Build
+        run: go build ./...
+
+      - name: Run tests
+        run: go test -count=1 -race ./...
